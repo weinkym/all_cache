@@ -21,6 +21,7 @@ public:
     bool isLoading();
     QPixmap getPixmap();
     QString getId();
+    QString getName();
 
 signals:
     void sigDownloadFinished(const QString &id,int error);

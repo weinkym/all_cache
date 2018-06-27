@@ -52,3 +52,8 @@ QString CLJLotteryUser::getId()
 {
     return m_id;
 }
+
+QString CLJLotteryUser::getName()
+{
+    return m_name;
+}

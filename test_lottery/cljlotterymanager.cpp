@@ -74,16 +74,17 @@ QPixmap CLJLotteryManager::createUserPixmap(const QSharedPointer<CLJLotteryUser>
         return m_cechePixmapMap.value(key);
     }
 
+    QPixmap src = user.data()->getPixmap();
     if(src.isNull())
     {
         return QPixmap();
     }
 
-    int devicePixelRatio = 2;
-    QSize ssize(50,50);
-    QSize size(ssize * devicePixelRatio);
-    QPixmap pixmap = src.scaled(size,Qt::KeepAspectRatioByExpanding,Qt::SmoothTransformation);
-    QPixmap userPixmap(size);
+//    int devicePixelRatio = 2;
+//    QSize ssize(50,50);
+    QSize pixmapSize(size * devicePixelRatio);
+    QPixmap pixmap = src.scaled(pixmapSize,Qt::KeepAspectRatioByExpanding,Qt::SmoothTransformation);
+    QPixmap userPixmap(pixmapSize);
     userPixmap.fill(QColor(77,77,77,50));
     QPainter painter(&userPixmap);
     painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing
@@ -94,7 +95,7 @@ QPixmap CLJLotteryManager::createUserPixmap(const QSharedPointer<CLJLotteryUser>
     QPen pen(Qt::white);
     pen.setWidth(3);
     painter.setPen(pen);
-    painter.drawEllipse(QRect(0,0,size.width(),size.height()));
+    painter.drawEllipse(QRect(0,0,pixmapSize.width(),pixmapSize.height()));
 
     {
         static int index = 1;
@@ -102,15 +103,16 @@ QPixmap CLJLotteryManager::createUserPixmap(const QSharedPointer<CLJLotteryUser>
         font.setPixelSize(64);
         painter.setFont(font);
 //        QString text = QString::number(index++);
-        QString text = name;
+        QString text = user.data()->getName();
         QPen pen(Qt::red);
         painter.setPen(pen);
         QFontMetrics fontMetrics(font);
         QRect rect = fontMetrics.boundingRect(text);
-        painter.drawText(QRect((size.width() - rect.width()) / 2,(size.height() - rect.height()) / 2
+        painter.drawText(QRect((pixmapSize.width() - rect.width()) / 2,(pixmapSize.height() - rect.height()) / 2
                                ,rect.width(),rect.height()),text);
     }
     userPixmap.setDevicePixelRatio(devicePixelRatio);
+    m_cechePixmapMap.insert(key,userPixmap);
     return userPixmap;
 }
 
