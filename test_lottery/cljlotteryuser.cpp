@@ -31,7 +31,7 @@ void CLJLotteryUser::loadImage()
     }
     m_status = REQUEST_STATUS_STARTING;
     QTimer::singleShot(500, [this]{
-        qDebug()<<"url="<<m_url;
+//        qDebug()<<"url="<<m_url;
 //        m_pixmap = CLJLotteryManager::createUserPixmap(QPixmap(m_url),m_name);
         m_pixmap = QPixmap(m_url);
         emit sigDownloadFinished(m_id,m_pixmap.isNull() ? 1:0);

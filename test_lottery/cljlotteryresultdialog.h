@@ -29,6 +29,11 @@ private slots:
 
     void on_pushButtonStop_clicked();
 
+    void on_pushButton_clicked();
+
+private:
+    void showResult(bool show);
+
 private:
     Ui::CLJLotterResultDialog *ui;
     CLJLotteryAnimationView *m_viewAnimation;

@@ -202,7 +202,7 @@ void CLJLotteryManager::onUserDownloadFinished(const QString &id, int error)
 
 void CLJLotteryManager::request()
 {
-    qDebug()<<Q_FUNC_INFO<<__LINE__;
+//    qDebug()<<Q_FUNC_INFO<<__LINE__;
     int downCount = m_cacheCount - m_downloadingUserMap.count();
     for(int i = 0; i < downCount;++i)
     {

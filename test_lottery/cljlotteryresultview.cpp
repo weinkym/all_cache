@@ -5,7 +5,8 @@ CLJLotteryResultView::CLJLotteryResultView(QWidget *parent)
     :QGraphicsView(parent)
     ,m_scene(NULL)
 {
-
+    this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 }
 
 CLJLotteryResultView::~CLJLotteryResultView()
@@ -47,26 +48,44 @@ void CLJLotteryResultView::updateResult(const QList<QSharedPointer<CLJLotteryUse
     {
         return;
     }
+    int viewWidth = 354;
     QSize m_itemSize = QSize(150 / col,150 / col);
-
-    int m_margin = 5;
-    QSize size(m_itemSize.width() + 2 * m_margin,m_itemSize.height() + 2 * m_margin);
+    if(col == 1)
+    {
+        m_itemSize = QSize(124,124);
+    }
+    else if(col == 2)
+    {
+        m_itemSize = QSize(82,82);
+    }
+    else
+    {
+        m_itemSize = QSize(72,72);
+    }
+    int margin_h = (viewWidth - col * m_itemSize.width()) / (col + 1);
+    int x = margin_h;
+    int y = 0;
+    int margin_v = 10;
+    int margin = 5;
     for(int i = 0; i < row; ++i)
     {
-        int y = m_itemSize.height() * i + (2 * i + 1) * m_margin;
+        x = margin_h;
         for(int j = 0; j < col; ++j)
         {
-            int x = m_itemSize.width() * j + (2 * j + 1) * m_margin;
+//            int x = m_itemSize.width() * j + (2 * j + 1) * m_margin;
             CLJLotteryUserItem *item = new CLJLotteryUserItem(m_itemSize);
             item->setPos(x,y);
 //            item->setSize(QSize(40,40));
             m_scene->addItem(item);
 //            m_itemList.append(item);
-
+            x = x + m_itemSize.width() + margin_h;
         }
+        y = y + margin_v + m_itemSize.height();
     }
     {
-        m_scene->addRect(QRect(0,0,size.width() * col,size.height() * row));
+        m_scene->addRect(QRect(0,0,viewWidth,y));
     }
-
+    this->setMinimumHeight(y);
+    this->setMaximumHeight(y);
+    this->adjustSize();
 }

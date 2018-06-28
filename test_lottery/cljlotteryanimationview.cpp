@@ -2,15 +2,19 @@
 #include <QGraphicsScene>
 #include "cljlotteryuseritem.h"
 #include "cljlotterymanager.h"
+#include <QScrollBar>
 
 CLJLotteryAnimationView::CLJLotteryAnimationView(QWidget *parent)
     :QGraphicsView(parent)
     ,m_scene(NULL)
-    ,m_row(4)
-    ,m_col(6)
+    ,m_row(2)
+    ,m_col(3)
     ,m_margin(5)
     ,m_itemSize(50,50)
 {
+    this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
     m_timer.setInterval(20);
     connect(&m_timer,SIGNAL(timeout()),this,SLOT(onTimeout()));
     connect(CLJLotteryManager::getInstance(),SIGNAL(sigUserDataReady(int)),this,SLOT(onUserDataReady(int)));
@@ -29,7 +33,14 @@ CLJLotteryAnimationView::~CLJLotteryAnimationView()
 
 void CLJLotteryAnimationView::stop()
 {
+    qDebug()<<Q_FUNC_INFO;
     m_timer.stop();
+    m_itemList.clear();
+    m_scene->clear();
+    this->horizontalScrollBar()->setValue(0);
+    this->horizontalScrollBar()->setMaximum(0);
+    this->verticalScrollBar()->setValue(0);
+    this->verticalScrollBar()->setMaximum(0);
 }
 
 void CLJLotteryAnimationView::startShow()
@@ -48,7 +59,6 @@ void CLJLotteryAnimationView::startShow()
             int x = m_itemSize.width() * col + (2 * col + 1) * m_margin;
             CLJLotteryUserItem *item = new CLJLotteryUserItem(m_itemSize);
             item->setPos(x,y);
-//            item->setSize(QSize(40,40));
             m_scene->addItem(item);
             m_itemList.append(item);
 
@@ -58,6 +68,8 @@ void CLJLotteryAnimationView::startShow()
         m_scene->addRect(QRect(0,0,size.width() * m_col,size.height() * m_row));
     }
     m_timer.start();
+    this->setMinimumHeight(size.height() * m_row);
+    this->setMaximumHeight(size.height() * m_row);
 }
 
 void CLJLotteryAnimationView::onTimeout()
