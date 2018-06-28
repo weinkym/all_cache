@@ -1,5 +1,6 @@
 #include "cljlotteryresultview.h"
 #include "cljlotteryuseritem.h"
+#include <QWheelEvent>
 
 CLJLotteryResultView::CLJLotteryResultView(QWidget *parent)
     :QGraphicsView(parent)
@@ -33,7 +34,7 @@ void CLJLotteryResultView::updateResult(const QList<QSharedPointer<CLJLotteryUse
     int row = 0;
     int col = 0;
     int count = userList.count();
-    count=1;
+    count=6;
     if(count <= 3)
     {
         row = 1;
@@ -64,8 +65,8 @@ void CLJLotteryResultView::updateResult(const QList<QSharedPointer<CLJLotteryUse
     }
     int margin_h = (viewWidth - col * m_itemSize.width()) / (col + 1);
     int x = margin_h;
-    int y = 0;
     int margin_v = 10;
+    int y = margin_v / 2;
     int margin = 5;
     for(int i = 0; i < row; ++i)
     {
@@ -82,10 +83,16 @@ void CLJLotteryResultView::updateResult(const QList<QSharedPointer<CLJLotteryUse
         }
         y = y + margin_v + m_itemSize.height();
     }
+    QRect rect(0,0,viewWidth,y - margin_v / 2);
     {
-        m_scene->addRect(QRect(0,0,viewWidth,y));
+        m_scene->addRect(rect,QPen(Qt::red));
     }
-    this->setMinimumHeight(y);
-    this->setMaximumHeight(y);
-    this->adjustSize();
+    this->setMinimumHeight(rect.height());
+    this->setMaximumHeight(rect.height());
+    //    this->adjustSize();
+}
+
+void CLJLotteryResultView::wheelEvent(QWheelEvent *event)
+{
+    event->accept();
 }

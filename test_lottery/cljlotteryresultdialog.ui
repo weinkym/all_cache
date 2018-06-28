@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>588</width>
-    <height>521</height>
+    <width>354</width>
+    <height>338</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -24,6 +24,13 @@
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">#CLJLotterResultDialog{
+border-radius: 11px;
+border: 2px solid #FF0000;
+}
+</string>
   </property>
   <layout class="QVBoxLayout" name="vLayout">
    <property name="spacing">
@@ -56,9 +63,12 @@
       </size>
      </property>
      <property name="styleSheet">
-      <string notr="true">background: rgb(95,97,194);;
+      <string notr="true">#widget{
 border-top-left-radius: 23px;
-border-top-right-radius: 23px;</string>
+border-top-right-radius: 23px;
+border-image: url(:/res/lottery/lottery_title_2x.png) 0 0 0 0;
+}
+</string>
      </property>
      <widget class="QPushButton" name="pushButton_2">
       <property name="geometry">
@@ -180,7 +190,7 @@ color:#ff0000;</string>
    <item>
     <widget class="QWidget" name="widget_2" native="true">
      <property name="styleSheet">
-      <string notr="true">background: #FFFF00;
+      <string notr="true">background: #FFFFF9;
 border-bottom-left-radius: 23px;
 border-bottom-right-radius: 23px;
 </string>

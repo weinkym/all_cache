@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>res/lottery/lottery_title_2x.png</file>
+    </qresource>
+</RCC>

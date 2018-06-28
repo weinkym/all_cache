@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include <QApplication>
 #include "cljlotteryresultdialog.h"
+#include "cljshadowwidget.h"
 
 int main(int argc, char *argv[])
 {
@@ -8,8 +9,11 @@ int main(int argc, char *argv[])
 //    MainWindow w;
 //    w.show();
 
-    CLJLotterResultDialog dlg;
-    dlg.show();
+    CLJShadowWidget w;
+    w.show();
+
+//    CLJLotterResultDialog dlg;
+//    dlg.show();
 
     return a.exec();
 }

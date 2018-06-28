@@ -16,6 +16,9 @@ public:
     ~CLJLotteryResultView();
     void updateResult(const QList<QSharedPointer<CLJLotteryUser> > &userList);
 
+protected:
+    void wheelEvent(QWheelEvent *event);
+
 private:
     QGraphicsScene *m_scene;
 

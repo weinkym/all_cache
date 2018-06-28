@@ -31,6 +31,11 @@ private slots:
 
     void on_pushButton_clicked();
 
+    void onUserDataReady();
+
+protected:
+    void paintEvent(QPaintEvent *event);
+
 private:
     void showResult(bool show);
 
