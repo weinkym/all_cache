@@ -10,9 +10,6 @@ CLJLotterResultDialog::CLJLotterResultDialog(QWidget *parent) :
     ui(new Ui::CLJLotterResultDialog)
 {
     ui->setupUi(this);
-//    setWindowFlags(Qt::FramelessWindowHint);
-//    setAttribute(Qt::WA_TranslucentBackground);
-
     m_viewAnimation = new CLJLotteryAnimationView;
     ui->viewLayout->addWidget(m_viewAnimation);
 
@@ -26,6 +23,8 @@ CLJLotterResultDialog::CLJLotterResultDialog(QWidget *parent) :
     this->layout()->setSizeConstraint(QLayout::SetFixedSize);
 
     this->setContentsMargins(5,5,5,5);
+
+    showResult(false);
 }
 
 CLJLotterResultDialog::~CLJLotterResultDialog()
@@ -57,16 +56,9 @@ void CLJLotterResultDialog::onLotteryFinished(int error)
     showResult(true);
 }
 
-void CLJLotterResultDialog::on_pushButtonStop_clicked()
-{
-    CLJLotteryManager::getInstance()->testStop();
-}
-
 void CLJLotterResultDialog::on_pushButton_clicked()
 {
     showResult(m_viewAnimation->isVisible());
-
-    //    ui->stackedWidget->setCurrentIndex((ui->stackedWidget->currentIndex() + 1) % ui->stackedWidget->count());
 }
 
 void CLJLotterResultDialog::onUserDataReady()
@@ -75,44 +67,20 @@ void CLJLotterResultDialog::onUserDataReady()
     showResult(false);
 }
 
-void CLJLotterResultDialog::paintEvent(QPaintEvent *event)
-{
-//    //通过绘制透明度渐变的多个圆角矩形来实现阴影
-//    int width = this->width();
-//    int height = this->height();
-//    static double shadow = 0.5;   //阴影的最大不透明度
-//    static quint64 size = 6;     //阴影宽度
-//    QPainter painter(this);
-////    for(unsigned int i = 0; i < size; i++)
-////    {
-////        painter.setOpacity(shadow / size * i);
-//////        painter.drawRoundedRect(i, i + size, width - i * 2, height - i * 2 - size, size - i, size - i);
-////        painter.drawRoundedRect(i, i + size, width - i * 2, height - i * 2 - size, size - i + 23, size - i + 23);
-////    }
-////    painter.
-//    {
-//        int size = 23;
-//        QPoint center(size,size);
-
-//        QRadialGradient gradient(center, size,center);
-//        //    QRadialGradient gradient(0, 50, 50, 50, 50);
-//        gradient.setColorAt(0, QColor::fromRgbF(0, 1, 0, 1));
-//        gradient.setColorAt(0.05, QColor::fromRgbF(0, 0, 1, 1));
-//        gradient.setColorAt(0.91, QColor::fromRgbF(1, 0, 1, 1));
-//        gradient.setColorAt(1, QColor::fromRgbF(1, 1, 0, 1));
-//        QBrush brush(gradient);
-//        painter.setBrush(brush);
-////        painter.drawRoundedRect(0,0,size,size,size / 2,size /2);
-//        painter.drawRect(0,0,size,size);
-
-//    }
-
-////    painter.drawRoundedRect(0,0,size,size,23,23);
-    CLJDialog::paintEvent(event);
-}
 
 void CLJLotterResultDialog::showResult(bool show)
 {
+    ui->widgetTitle->setStyleSheet(QString("#widgetTitle{border-top-left-radius: 23px;border-top-right-radius: 23px;"
+                                   "border-image: url(:/res/lottery/lottery_title%1.png) 0 0 0 0;}").arg(show ? "_win":""));
+    ui->widgetStop->setVisible(!show);
+    ui->pbStop->setEnabled(!show);
     m_viewAnimation->setVisible(!show);
+    ui->pushButtonClose->setVisible(show);
     m_viewResult->setVisible(show);
+}
+
+void CLJLotterResultDialog::on_pbStop_clicked()
+{
+    ui->pbStop->setEnabled(false);
+    CLJLotteryManager::getInstance()->stop();
 }

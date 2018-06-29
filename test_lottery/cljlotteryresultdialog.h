@@ -28,14 +28,12 @@ private slots:
 
     void onLotteryFinished(int error);
 
-    void on_pushButtonStop_clicked();
-
     void on_pushButton_clicked();
 
     void onUserDataReady();
 
-protected:
-    void paintEvent(QPaintEvent *event);
+
+    void on_pbStop_clicked();
 
 private:
     void showResult(bool show);

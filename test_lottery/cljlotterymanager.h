@@ -65,7 +65,7 @@ public:
     QList<QSharedPointer<CLJLotteryUser> > getSelectedUsers();
 
     void testAll();
-    void testStop();
+    void stop();
 
 private slots:
     void onUserDownloadFinished(const QString &id,int error);

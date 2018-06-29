@@ -222,8 +222,13 @@ void CLJLotteryManager::testAll()
     }
 }
 
-void CLJLotteryManager::testStop()
+void CLJLotteryManager::stop()
 {
+    if(m_status != LOTTERY_STATUS_STARTING)
+    {
+        return;
+    }
+
     int count = qMin(m_lotteryCount,m_allUserMap.count());
     int index = 0;
 
@@ -238,11 +243,6 @@ void CLJLotteryManager::testStop()
     }
     m_status = LOTTERY_STATUS_FINISHED;
     emit sigLotteryFinished(0);
-//    while(index < count)
-//    {
-//        int id = qrand() % 100;
-
-//    }
 }
 
 void CLJLotteryManager::onUserDownloadFinished(const QString &id, int error)
@@ -312,7 +312,7 @@ QString CLJLotteryManager::createKey(const QString &id, ImageType type, bool isW
 
 CLJLotteryManager::CLJLotteryManager()
     :m_status(LOTTERY_STATUS_NORMAL)
-    ,m_lotteryCount(2)
+    ,m_lotteryCount(6)
 {
 
 }
