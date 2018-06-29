@@ -2,6 +2,7 @@
 #define CLJLotterResultDialog_H
 
 #include <QDialog>
+#include "cljdialog.h"
 
 namespace Ui {
 class CLJLotterResultDialog;
@@ -10,7 +11,7 @@ class CLJLotterResultDialog;
 class CLJLotteryAnimationView;
 class CLJLotteryResultView;
 
-class CLJLotterResultDialog : public QDialog
+class CLJLotterResultDialog : public CLJDialog
 {
     Q_OBJECT
 

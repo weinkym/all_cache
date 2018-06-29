@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QPainter>
 #include <QDoubleSpinBox>
+#include "cljshadowengine.h"
 
 class CLJShadowWidget : public QWidget
 {
@@ -16,17 +17,7 @@ protected:
     void paintEvent(QPaintEvent *event);
 
 private:
-    QBrush getBrush(const QPoint &center,int radius);
-    void setLineGradientPainter(QPainter *painter,const QPointF &startPoint,const QPointF &endPoint);
-
-private slots:
-    void onValueChanged();
-
-private:
-    QColor m_color;
-    int m_radius;
-    qreal m_shawPos;
-    QDoubleSpinBox *m_doubleSpinBox;
+   CLJShadowEngine m_shadowEngine;
 };
 
 #endif // CLJSHADOWWIDGET_H

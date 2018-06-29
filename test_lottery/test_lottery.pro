@@ -31,7 +31,9 @@ SOURCES += main.cpp\
     cljlotteryanimationview.cpp \
     cljlotterymanager.cpp \
     cljlotteryresultdialog.cpp \
-    cljshadowwidget.cpp
+    cljshadowwidget.cpp \
+    cljdialog.cpp \
+    cljshadowengine.cpp
 
 HEADERS  += mainwindow.h \
     cljlotteryuseritem.h \
@@ -40,7 +42,9 @@ HEADERS  += mainwindow.h \
     cljlotteryanimationview.h \
     cljlotterymanager.h \
     cljlotteryresultdialog.h \
-    cljshadowwidget.h
+    cljshadowwidget.h \
+    cljdialog.h \
+    cljshadowengine.h
 
 FORMS    += mainwindow.ui \
     cljlotteryresultdialog.ui

@@ -6,7 +6,7 @@
 #include "cljlotterymanager.h"
 
 CLJLotterResultDialog::CLJLotterResultDialog(QWidget *parent) :
-    QDialog(parent),
+    CLJDialog(parent),
     ui(new Ui::CLJLotterResultDialog)
 {
     ui->setupUi(this);
@@ -25,7 +25,7 @@ CLJLotterResultDialog::CLJLotterResultDialog(QWidget *parent) :
     connect(CLJLotteryManager::getInstance(),SIGNAL(sigUserDataReady()),this,SLOT(onUserDataReady()));
     this->layout()->setSizeConstraint(QLayout::SetFixedSize);
 
-    this->setContentsMargins(5,-5,5,5);
+    this->setContentsMargins(5,5,5,5);
 }
 
 CLJLotterResultDialog::~CLJLotterResultDialog()
@@ -77,38 +77,38 @@ void CLJLotterResultDialog::onUserDataReady()
 
 void CLJLotterResultDialog::paintEvent(QPaintEvent *event)
 {
-    //通过绘制透明度渐变的多个圆角矩形来实现阴影
-    int width = this->width();
-    int height = this->height();
-    static double shadow = 0.5;   //阴影的最大不透明度
-    static quint64 size = 6;     //阴影宽度
-    QPainter painter(this);
-//    for(unsigned int i = 0; i < size; i++)
+//    //通过绘制透明度渐变的多个圆角矩形来实现阴影
+//    int width = this->width();
+//    int height = this->height();
+//    static double shadow = 0.5;   //阴影的最大不透明度
+//    static quint64 size = 6;     //阴影宽度
+//    QPainter painter(this);
+////    for(unsigned int i = 0; i < size; i++)
+////    {
+////        painter.setOpacity(shadow / size * i);
+//////        painter.drawRoundedRect(i, i + size, width - i * 2, height - i * 2 - size, size - i, size - i);
+////        painter.drawRoundedRect(i, i + size, width - i * 2, height - i * 2 - size, size - i + 23, size - i + 23);
+////    }
+////    painter.
 //    {
-//        painter.setOpacity(shadow / size * i);
-////        painter.drawRoundedRect(i, i + size, width - i * 2, height - i * 2 - size, size - i, size - i);
-//        painter.drawRoundedRect(i, i + size, width - i * 2, height - i * 2 - size, size - i + 23, size - i + 23);
+//        int size = 23;
+//        QPoint center(size,size);
+
+//        QRadialGradient gradient(center, size,center);
+//        //    QRadialGradient gradient(0, 50, 50, 50, 50);
+//        gradient.setColorAt(0, QColor::fromRgbF(0, 1, 0, 1));
+//        gradient.setColorAt(0.05, QColor::fromRgbF(0, 0, 1, 1));
+//        gradient.setColorAt(0.91, QColor::fromRgbF(1, 0, 1, 1));
+//        gradient.setColorAt(1, QColor::fromRgbF(1, 1, 0, 1));
+//        QBrush brush(gradient);
+//        painter.setBrush(brush);
+////        painter.drawRoundedRect(0,0,size,size,size / 2,size /2);
+//        painter.drawRect(0,0,size,size);
+
 //    }
-//    painter.
-    {
-        int size = 23;
-        QPoint center(size,size);
 
-        QRadialGradient gradient(center, size,center);
-        //    QRadialGradient gradient(0, 50, 50, 50, 50);
-        gradient.setColorAt(0, QColor::fromRgbF(0, 1, 0, 1));
-        gradient.setColorAt(0.05, QColor::fromRgbF(0, 0, 1, 1));
-        gradient.setColorAt(0.91, QColor::fromRgbF(1, 0, 1, 1));
-        gradient.setColorAt(1, QColor::fromRgbF(1, 1, 0, 1));
-        QBrush brush(gradient);
-        painter.setBrush(brush);
-//        painter.drawRoundedRect(0,0,size,size,size / 2,size /2);
-        painter.drawRect(0,0,size,size);
-
-    }
-
-//    painter.drawRoundedRect(0,0,size,size,23,23);
-    QDialog::paintEvent(event);
+////    painter.drawRoundedRect(0,0,size,size,23,23);
+    CLJDialog::paintEvent(event);
 }
 
 void CLJLotterResultDialog::showResult(bool show)
