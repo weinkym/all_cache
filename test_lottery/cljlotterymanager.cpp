@@ -30,6 +30,58 @@ QPixmap CLJLotteryManager::createEllipsePixmap(const QPixmap &pixmap)
     return resultPixmap;
 }
 
+QString CLJLotteryManager::getImageTypeString(CLJLotteryManager::ImageType type)
+{
+    if(type == IMAGE_TYPE_ONE)
+    {
+        return "one";
+    }
+    else if(type == IMAGE_TYPE_THREE)
+    {
+        return "two";
+    }
+    else
+    {
+        return "three";
+    }
+}
+
+QPixmap CLJLotteryManager::getUserLablePixmap(CLJLotteryManager::ImageType type, bool isWinner, int devicePixelRatio)
+{
+    static QMap<QString,QPixmap> s_cacheLablePixmapMap;
+    QString key = createKey("",type,isWinner,devicePixelRatio);
+    if(s_cacheLablePixmapMap.contains(key))
+    {
+        return s_cacheLablePixmapMap.value(key);
+    }
+    UserAvatarParam param(type,isWinner);
+
+    QPixmap pixmap(QString(":/res/lottery/lottery_%1user_%2.png").arg(isWinner?"win_":"").arg(getImageTypeString(type)));
+    qDebug()<<"QPixmap pixmap"<<(pixmap.isNull() ? "Y":"N");
+    pixmap = pixmap.scaled(param.labelRect.size()* devicePixelRatio,
+                                     Qt::KeepAspectRatioByExpanding,Qt::SmoothTransformation);
+    s_cacheLablePixmapMap.insert(key,pixmap);
+    return pixmap;
+}
+
+QPixmap CLJLotteryManager::getWinnerLablePixmap(CLJLotteryManager::ImageType type, int devicePixelRatio)
+{
+    static QMap<QString,QPixmap> s_cacheLablePixmapMap;
+    QString key = createKey("",type,true,devicePixelRatio);
+    if(s_cacheLablePixmapMap.contains(key))
+    {
+        return s_cacheLablePixmapMap.value(key);
+    }
+    UserAvatarParam param(type,true);
+
+    QPixmap pixmap(QString(":/res/lottery/lottery_win_label_%1.png").arg(getImageTypeString(type)));
+    qDebug()<<"QPixmap pixmap"<<(pixmap.isNull() ? "Y":"N");
+    pixmap = pixmap.scaled(param.winnerLableRect.size()* devicePixelRatio,
+                                     Qt::KeepAspectRatioByExpanding,Qt::SmoothTransformation);
+    s_cacheLablePixmapMap.insert(key,pixmap);
+    return pixmap;
+}
+
 QPixmap CLJLotteryManager::getUserPixmap(ImageType type, bool isWinner, int devicePixelRatio)
 {
     if(!m_unDownloadUserList.isEmpty())
@@ -105,23 +157,28 @@ QPixmap CLJLotteryManager::createUserPixmap(const QSharedPointer<CLJLotteryUser>
         painter.restore();
     }
     {
-        QPixmap pixmap = QPixmap(":/res/lottery/lottery_win_label_one.png");
-        painter.drawPixmap(0,0,pixmap);
+        QPixmap pixmap = getUserLablePixmap(type,isWinner,devicePixelRatio);
+        painter.drawPixmap(param.labelRect.x() * devicePixelRatio,param.labelRect.y() * devicePixelRatio,pixmap);
     }
-//    {
-//        static int index = 1;
-//        QFont font;
-//        font.setPixelSize(64);
-//        painter.setFont(font);
-////        QString text = QString::number(index++);
-//        QString text = user.data()->getName();
-//        QPen pen(Qt::red);
-//        painter.setPen(pen);
-//        QFontMetrics fontMetrics(font);
-//        QRect rect = fontMetrics.boundingRect(text);
-//        painter.drawText(QRect((pixmapSize.width() - rect.width()) / 2,(pixmapSize.height() - rect.height()) / 2
-//                               ,rect.width(),rect.height()),text);
-//    }
+    {
+        painter.save();
+        QPen pen(QColor(255,255,255,255));
+        painter.setPen(pen);
+        QRect textRangeRect(param.nameRect.x() * devicePixelRatio,
+                            param.nameRect.y() * devicePixelRatio,
+                            param.nameRect.width() * devicePixelRatio,
+                            param.nameRect.height() * devicePixelRatio);
+        QFont font;
+        font.setPointSizeF(param.fontPixelSizeF);
+        painter.setFont(font);
+        painter.drawText(textRangeRect,user.data()->getName(),QTextOption(Qt::AlignHCenter | Qt::AlignVCenter));
+        painter.restore();
+    }
+    if(isWinner)
+    {
+        QPixmap pixmap = getWinnerLablePixmap(type,devicePixelRatio);
+        painter.drawPixmap(param.winnerLableRect.x() * devicePixelRatio,param.winnerLableRect.y() * devicePixelRatio,pixmap);
+    }
     userPixmap.setDevicePixelRatio(devicePixelRatio);
     m_cechePixmapMap.insert(key,userPixmap);
     return userPixmap;
@@ -167,7 +224,7 @@ void CLJLotteryManager::testAll()
 
 void CLJLotteryManager::testStop()
 {
-    int count = qMin(6,m_allUserMap.count());
+    int count = qMin(m_lotteryCount,m_allUserMap.count());
     int index = 0;
 
     m_selectedUserList.clear();
@@ -179,6 +236,7 @@ void CLJLotteryManager::testStop()
             m_selectedUserList.append(m_allUserMap.value(id));
         }
     }
+    m_status = LOTTERY_STATUS_FINISHED;
     emit sigLotteryFinished(0);
 //    while(index < count)
 //    {
@@ -208,8 +266,9 @@ void CLJLotteryManager::onUserDownloadFinished(const QString &id, int error)
         //TODO 错误了是否还需要重新下载
 //        m_unDownloadUserList.append(obj);
     }
-    if(m_finishedUserList.count() >= m_lotteryCount)
+    if(m_finishedUserList.count() >= m_lotteryCount && m_status == LOTTERY_STATUS_NORMAL)
     {
+        m_status = LOTTERY_STATUS_STARTING;
         emit sigUserDataReady();
     }
 
@@ -253,7 +312,7 @@ QString CLJLotteryManager::createKey(const QString &id, ImageType type, bool isW
 
 CLJLotteryManager::CLJLotteryManager()
     :m_status(LOTTERY_STATUS_NORMAL)
-    ,m_lotteryCount(6)
+    ,m_lotteryCount(2)
 {
 
 }
@@ -302,24 +361,44 @@ CLJLotteryManager::ViewParam::ViewParam(int lotteryCount, bool isWinner)
 CLJLotteryManager::UserAvatarParam::UserAvatarParam(CLJLotteryManager::ImageType type, bool isWinner)
 {
 
-//    if(type == IMAGE_TYPE_ONE)
+    qreal base_fontPixelSizeF = 36;
+    int base_avatartY = isWinner ? 5:0;
+    int base_avatartX = 14;
+    int base_winnerLableW = 38;
+    int base_winnerLableH = 26;
+    int base_winUserLableH = 45;
+    int base_nameDH = base_winUserLableH * 15 / 54;
+    QSize base_avatarSize(124,124);
+
+    qreal radio = 1;
+
+
+    if(type == IMAGE_TYPE_ONE)
     {
-        penWidth = 10;
-        int avatartY = isWinner ? 5:0;
-        int avatartX = 14;
-        avatarRect = QRect(avatartX,avatartY,124,124);
-        itemSize = QSize(avatarRect.width() + avatartX * 2,avatarRect.bottom());
-        labelRect = QRect(0,80,itemSize.width(),45);
-        int winnerLableW = 38;
-        int winnerLableH = 26;
-        winnerLableRect = QRect((itemSize.width() - winnerLableW) / 2,0,winnerLableW,winnerLableH);;
+        radio = 1;
     }
-//    else if(type == IMAGE_TYPE_TWO)
-//    {
-//        //
-//    }
-//    else
-//    {
-//        //
-//    }
+    else if(type == IMAGE_TYPE_TWO)
+    {
+        radio = 1.0 * 84 / 124;
+    }
+    else
+    {
+        radio = 1.0 * 71 / 124;
+    }
+
+    int avatartY = base_avatartY * radio;
+    int avatartX = base_avatartX * radio;
+    int winnerLableW = base_winnerLableW * radio;
+    int winnerLableH = base_winnerLableH * radio;
+    int winUserLableH = base_winUserLableH * radio;
+    int nameDH = base_nameDH * radio;
+    QSize avatarSize = base_avatarSize * radio;
+
+    penWidth = 10;
+    avatarRect = QRect(avatartX,avatartY,avatarSize.width(),avatarSize.height());
+    itemSize = QSize(avatarRect.width() + avatartX * 2,avatarRect.bottom());
+    labelRect = QRect(0,avatarRect.center().y(),itemSize.width(),winUserLableH);
+    winnerLableRect = QRect((itemSize.width() - winnerLableW) / 2,0,winnerLableW,winnerLableH);
+    nameRect = QRect(labelRect.x(),labelRect.y() + nameDH,labelRect.width(),labelRect.height() - nameDH);
+    fontPixelSizeF = base_fontPixelSizeF * radio;
 }

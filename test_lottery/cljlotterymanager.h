@@ -26,10 +26,12 @@ public:
     struct UserAvatarParam{
         UserAvatarParam(ImageType type,bool isWinner);
         int penWidth;
+        qreal fontPixelSizeF;
         QSize itemSize;
         QRect avatarRect;
         QRect labelRect;
         QRect winnerLableRect;
+        QRect nameRect;
     };
 
     struct ViewParam{
@@ -43,7 +45,13 @@ public:
     };
 
     static CLJLotteryManager* getInstance();
+
     static QPixmap createEllipsePixmap(const QPixmap &pixmap);
+
+    static QString getImageTypeString(ImageType type);
+
+    static QPixmap getUserLablePixmap(ImageType type,bool isWinner,int devicePixelRatio);
+    static QPixmap getWinnerLablePixmap(ImageType type,int devicePixelRatio);
 
     QPixmap getUserPixmap(ImageType type,bool isWinner,int devicePixelRatio = 1);
 

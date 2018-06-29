@@ -72,7 +72,6 @@ void CLJLotteryAnimationView::start(int lotteryCount)
             item->setPos(x,y);
             m_scene->addItem(item);
             x = x + param.avatarParam.itemSize.width() + param.margin_h;
-//            qDebug()<<"boundingRect.width()"<<item->boundingRect().width();
             m_itemList.append(item);
         }
         y = y + param.margin_v + param.avatarParam.itemSize.height();
@@ -84,7 +83,7 @@ void CLJLotteryAnimationView::start(int lotteryCount)
     }
     this->setMinimumHeight(rect.height());
     this->setMaximumHeight(rect.height());
-//    m_timer.start();
+    m_timer.start();
 }
 
 void CLJLotteryAnimationView::wheelEvent(QWheelEvent *event)
