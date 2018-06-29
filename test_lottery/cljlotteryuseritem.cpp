@@ -1,13 +1,13 @@
 #include "cljlotteryuseritem.h"
 #include "cljlotterymanager.h"
 
-CLJLotteryUserItem::CLJLotteryUserItem(const QSize &size, QGraphicsItem *parent)
+CLJLotteryUserItem::CLJLotteryUserItem(CLJLotteryManager::ImageType &type, bool isWinner, QGraphicsItem *parent)
     :QGraphicsPixmapItem(parent)
-    ,m_size(size)
+    ,m_isWinner(isWinner)
+    ,m_imageType(type)
 {
     updateConttent();
 }
-
 
 CLJLotteryUserItem::~CLJLotteryUserItem()
 {
@@ -27,7 +27,7 @@ CLJLotteryUserItem::~CLJLotteryUserItem()
 
 void CLJLotteryUserItem::updateConttent()
 {
-    QPixmap pixmap = CLJLotteryManager::getInstance()->getUserPixmap(m_size,2);
+    QPixmap pixmap = CLJLotteryManager::getInstance()->getUserPixmap(m_imageType,m_isWinner,2);
     if(pixmap.isNull())
     {
         return;

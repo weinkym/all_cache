@@ -23,7 +23,7 @@ void CLJShadowEngine::setColor(const QColor &color)
 
 void CLJShadowEngine::setRadius(int radius)
 {
-    if(radius > 0)
+    if(radius >= 0)
     {
         m_radius = radius;
     }
@@ -31,7 +31,7 @@ void CLJShadowEngine::setRadius(int radius)
 
 void CLJShadowEngine::setShadowWidth(int width)
 {
-    if(width > 0)
+    if(width >= 0)
     {
         m_shawWidth = width;
     }

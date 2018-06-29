@@ -10,8 +10,8 @@ CLJLotterResultDialog::CLJLotterResultDialog(QWidget *parent) :
     ui(new Ui::CLJLotterResultDialog)
 {
     ui->setupUi(this);
-    setWindowFlags(Qt::FramelessWindowHint);
-    setAttribute(Qt::WA_TranslucentBackground);
+//    setWindowFlags(Qt::FramelessWindowHint);
+//    setAttribute(Qt::WA_TranslucentBackground);
 
     m_viewAnimation = new CLJLotteryAnimationView;
     ui->viewLayout->addWidget(m_viewAnimation);

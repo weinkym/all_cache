@@ -8,7 +8,7 @@
 CLJLotteryAnimationView::CLJLotteryAnimationView(QWidget *parent)
     :QGraphicsView(parent)
     ,m_scene(NULL)
-    ,param(6)
+    ,param(6,false)
 {
 
     this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -57,32 +57,34 @@ void CLJLotteryAnimationView::start(int lotteryCount)
         m_scene->clear();
         m_itemList.clear();
     }
-    param = CLJLotteryManager::ViewParam(lotteryCount);
+    param = CLJLotteryManager::ViewParam(lotteryCount,false);
 
     int row = param.row + 1;
     int x = param.margin_h;
     int y = param.margin_v / 2;
+    qDebug()<<"param.avatarParam.itemSize.width()"<<param.avatarParam.itemSize.width()<<param.margin_h;
     for(int i = 0; i < row; ++i)
     {
         x = param.margin_h;
         for(int j = 0; j < param.col; ++j)
         {
-            CLJLotteryUserItem *item = new CLJLotteryUserItem(param.itemSize);
+            CLJLotteryUserItem *item = new CLJLotteryUserItem(param.imageType,false);
             item->setPos(x,y);
             m_scene->addItem(item);
-            x = x + param.itemSize.width() + param.margin_h;
+            x = x + param.avatarParam.itemSize.width() + param.margin_h;
+//            qDebug()<<"boundingRect.width()"<<item->boundingRect().width();
             m_itemList.append(item);
         }
-        y = y + param.margin_v + param.itemSize.height();
+        y = y + param.margin_v + param.avatarParam.itemSize.height();
     }
-    QRect rect(0,0,(param.itemSize.width() + param.margin_h) * param.col + param.margin_h,
-               y - param.margin_v / 2 - param.margin_v - param.itemSize.height());
+    QRect rect(0,0,(param.avatarParam.itemSize.width() + param.margin_h) * param.col + param.margin_h,
+               y - param.margin_v / 2 - param.margin_v - param.avatarParam.itemSize.height());
     {
         m_scene->addRect(rect,QPen(Qt::red),QBrush(QColor(12,0,0,77)));
     }
     this->setMinimumHeight(rect.height());
     this->setMaximumHeight(rect.height());
-    m_timer.start();
+//    m_timer.start();
 }
 
 void CLJLotteryAnimationView::wheelEvent(QWheelEvent *event)
@@ -95,13 +97,13 @@ void CLJLotteryAnimationView::onTimeout()
 {
     int dy = 4;
     int row = param.row + 1;
-    int itemHeight = param.itemSize.height() + param.margin_v;
+    int itemHeight = param.avatarParam.itemSize.height() + param.margin_v;
     int contentHeight = itemHeight * row;
     for(auto obj:m_itemList)
     {
         QPointF pos = obj->pos();
         int y = pos.y() - dy;
-        if(y + param.itemSize.height() < param.margin_v / 2)
+        if(y + param.avatarParam.itemSize.height() < param.margin_v / 2)
         {
             y += contentHeight;
             obj->updateConttent();

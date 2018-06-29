@@ -4,11 +4,12 @@
 CLJDialog::CLJDialog(QWidget *parent, Qt::WindowFlags f)
     :QDialog(parent,f)
 {
-    setWindowFlags(Qt::FramelessWindowHint);
+    this->setWindowFlags(Qt::ToolTip | Qt::FramelessWindowHint | Qt::Dialog);
+//    setWindowFlags(Qt::FramelessWindowHint);
     setAttribute(Qt::WA_TranslucentBackground);
-    setShadowColor(QColor(255,0,0,255));
+    setShadowColor(QColor(55,55,55,11));
     setShadowRadius(29);
-    setShadowWidth(6);
+    setShadowWidth(3);
 }
 
 CLJDialog::~CLJDialog()

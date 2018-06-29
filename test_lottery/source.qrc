@@ -1,5 +1,15 @@
 <RCC>
     <qresource prefix="/">
-        <file>res/lottery/lottery_title_2x.png</file>
+        <file>res/lottery/lottery_title_win.png</file>
+        <file>res/lottery/lottery_title.png</file>
+        <file>res/lottery/lottery_user_one.png</file>
+        <file>res/lottery/lottery_user_three.png</file>
+        <file>res/lottery/lottery_user_two.png</file>
+        <file>res/lottery/lottery_win_label_one.png</file>
+        <file>res/lottery/lottery_win_label_three.png</file>
+        <file>res/lottery/lottery_win_label_two.png</file>
+        <file>res/lottery/lottery_win_user_one.png</file>
+        <file>res/lottery/lottery_win_user_three.png</file>
+        <file>res/lottery/lottery_win_user_two.png</file>
     </qresource>
 </RCC>

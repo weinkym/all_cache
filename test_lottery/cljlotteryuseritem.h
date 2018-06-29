@@ -2,12 +2,13 @@
 #define CLJLOTTERYUSERITEM_H
 
 #include <QGraphicsItem>
+#include "cljlotterymanager.h"
 
 class CLJLotteryUserItem : public QGraphicsPixmapItem
 {
 //    Q_OBJECT
 public:
-    CLJLotteryUserItem(const QSize &size,QGraphicsItem *parent = Q_NULLPTR);
+    CLJLotteryUserItem(CLJLotteryManager::ImageType &type,bool isWinner,QGraphicsItem *parent = Q_NULLPTR);
     ~CLJLotteryUserItem();
 //    void setSize(const QSize &size);
 
@@ -16,7 +17,8 @@ public:
 
 private:
     QPixmap m_pixmap;
-    QSize m_size;
+    bool m_isWinner;
+    CLJLotteryManager::ImageType m_imageType;
 };
 
 #endif // CLJLOTTERYUSERITEM_H

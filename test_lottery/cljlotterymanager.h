@@ -17,19 +17,37 @@ public:
         LOTTERY_STATUS_STARTING,
         LOTTERY_STATUS_FINISHED,
     };
+    enum ImageType{
+        IMAGE_TYPE_ONE,
+        IMAGE_TYPE_TWO,
+        IMAGE_TYPE_THREE,
+    };
+
+    struct UserAvatarParam{
+        UserAvatarParam(ImageType type,bool isWinner);
+        int penWidth;
+        QSize itemSize;
+        QRect avatarRect;
+        QRect labelRect;
+        QRect winnerLableRect;
+    };
+
     struct ViewParam{
-        ViewParam(int lotteryCount);
+        ViewParam(int lotteryCount,bool isWinner);
+        UserAvatarParam avatarParam;
+        ImageType imageType;
         int col;
         int row;
         int margin_h;
         int margin_v;
-        QSize itemSize;
     };
 
     static CLJLotteryManager* getInstance();
-    QPixmap getUserPixmap(const QSize &size,int devicePixelRatio = 1);
+    static QPixmap createEllipsePixmap(const QPixmap &pixmap);
 
-    QPixmap createUserPixmap(const QSharedPointer<CLJLotteryUser> &user,const QSize &size,int devicePixelRatio);
+    QPixmap getUserPixmap(ImageType type,bool isWinner,int devicePixelRatio = 1);
+
+    QPixmap createUserPixmap(const QSharedPointer<CLJLotteryUser> &user,ImageType type,bool isWinner,int devicePixelRatio);
 
     int getUserReadyCount();
     int getLotteryCount();
@@ -47,7 +65,7 @@ private slots:
 private:
     void request();
     void appendUser(const QString &json);
-    static QString createKey(const QString &id,const QSize &size,int devicePixelRatio);
+    static QString createKey(const QString &id,ImageType type,bool isWinner,int devicePixelRatio);
 
 signals:
     void sigUserDataReady();
