@@ -2,6 +2,7 @@
 #define CLJLOTTERYANIMATIONVIEW_H
 #include <QGraphicsView>
 #include <QTimer>
+#include "cljlotterymanager.h"
 
 class QGraphicsScene;
 class CLJLotteryUserItem;
@@ -13,20 +14,17 @@ public:
     CLJLotteryAnimationView(QWidget *parent = Q_NULLPTR);
     ~CLJLotteryAnimationView();
     void stop();
+    void start(int selectCount);
+
+protected:
+    void wheelEvent(QWheelEvent *event);
 
 private slots:
     void onTimeout();
-    void onUserDataReady(int count);
-
-private:
-    void startShow();
 
 private:
     QGraphicsScene *m_scene;
-    int m_row;
-    int m_col;
-    int m_margin;
-    QSize m_itemSize;
+    CLJLotteryManager::ViewParam param;
     QTimer m_timer;
     QList<CLJLotteryUserItem*> m_itemList;
 };

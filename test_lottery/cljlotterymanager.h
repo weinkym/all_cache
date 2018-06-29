@@ -17,6 +17,14 @@ public:
         LOTTERY_STATUS_STARTING,
         LOTTERY_STATUS_FINISHED,
     };
+    struct ViewParam{
+        ViewParam(int lotteryCount);
+        int col;
+        int row;
+        int margin_h;
+        int margin_v;
+        QSize itemSize;
+    };
 
     static CLJLotteryManager* getInstance();
     QPixmap getUserPixmap(const QSize &size,int devicePixelRatio = 1);
@@ -42,7 +50,7 @@ private:
     static QString createKey(const QString &id,const QSize &size,int devicePixelRatio);
 
 signals:
-    void sigUserDataReady(int count);
+    void sigUserDataReady();
     void sigLotteryFinished(int error);
 
 protected:

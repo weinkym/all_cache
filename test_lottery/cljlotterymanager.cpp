@@ -87,16 +87,16 @@ QPixmap CLJLotteryManager::createUserPixmap(const QSharedPointer<CLJLotteryUser>
     QPixmap userPixmap(pixmapSize);
     userPixmap.fill(QColor(77,77,77,50));
     QPainter painter(&userPixmap);
-    painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing
-                           | QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing);
+//    painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing
+//                           | QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing);
+    painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
 
 
     painter.setBrush(QBrush(pixmap));
     QPen pen(Qt::white);
-    pen.setWidth(3);
+    pen.setWidth(6);
     painter.setPen(pen);
-    painter.drawEllipse(QRect(0,0,pixmapSize.width(),pixmapSize.height()));
-
+    painter.drawEllipse(QRectF(pen.widthF() / 2,pen.widthF() / 2,pixmapSize.width() - pen.widthF(),pixmapSize.height() - pen.widthF()));
     {
         static int index = 1;
         QFont font;
@@ -190,7 +190,6 @@ void CLJLotteryManager::onUserDownloadFinished(const QString &id, int error)
     if(error == 0)
     {
         m_finishedUserList.append(obj);
-        emit sigUserDataReady(m_finishedUserList.count());
     }
     else
     {
@@ -198,6 +197,11 @@ void CLJLotteryManager::onUserDownloadFinished(const QString &id, int error)
         //TODO 错误了是否还需要重新下载
 //        m_unDownloadUserList.append(obj);
     }
+    if(m_finishedUserList.count() >= m_lotteryCount)
+    {
+        emit sigUserDataReady();
+    }
+
 }
 
 void CLJLotteryManager::request()
@@ -238,6 +242,46 @@ QString CLJLotteryManager::createKey(const QString &id, const QSize &size, int d
 
 CLJLotteryManager::CLJLotteryManager()
     :m_status(LOTTERY_STATUS_NORMAL)
+    ,m_lotteryCount(6)
 {
 
+}
+
+CLJLotteryManager::ViewParam::ViewParam(int lotteryCount)
+{
+    row = 0;
+    col = 0;
+//    int selecteCount = selectCount;
+//    selecteCount=6;
+    if(lotteryCount <= 3)
+    {
+        row = 1;
+        col = lotteryCount;
+    }
+    else if(lotteryCount <= 6)
+    {
+        row = 2;
+        col = 3;
+    }
+    else
+    {
+        row = 2;
+        col = 3;
+    }
+    int viewWidth = 354;
+//    QSize m_itemSize = QSize(50,50);
+    if(col == 1)
+    {
+        itemSize = QSize(124,124);
+    }
+    else if(col == 2)
+    {
+        itemSize = QSize(82,82);
+    }
+    else
+    {
+        itemSize = QSize(72,72);
+    }
+    margin_h = (viewWidth - col * itemSize.width()) / (col + 1);
+    margin_v = 10;
 }
