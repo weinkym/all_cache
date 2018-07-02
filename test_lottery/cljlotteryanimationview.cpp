@@ -1,7 +1,7 @@
 #include "cljlotteryanimationview.h"
 #include <QGraphicsScene>
-#include "cljlotteryuseritem.h"
 #include "cljlotterymanager.h"
+#include <QGraphicsPixmapItem>
 #include <QScrollBar>
 #include <QWheelEvent>
 
@@ -62,14 +62,21 @@ void CLJLotteryAnimationView::start(int lotteryCount)
     int row = param.row + 1;
     int x = param.margin_h;
     int y = param.margin_v / 2;
-    qDebug()<<"param.avatarParam.itemSize.width()"<<param.avatarParam.itemSize.width()<<param.margin_h;
+    qDebug()<<"param.avatarParam.itemSize.width()"<<param.avatarParam.itemSize.width()<<param.margin_h<<param.margin_v;
     for(int i = 0; i < row; ++i)
     {
         x = param.margin_h;
         for(int j = 0; j < param.col; ++j)
         {
-            CLJLotteryUserItem *item = new CLJLotteryUserItem(param.imageType,false);
+            QGraphicsPixmapItem *item = new QGraphicsPixmapItem();
             item->setPos(x,y);
+
+            QPixmap pixmap = CLJLotteryManager::getInstance()->getUserPixmap(param.imageType,false,this->devicePixelRatio());
+            if(!pixmap.isNull())
+            {
+                item->setPixmap(pixmap);
+            }
+
             m_scene->addItem(item);
             x = x + param.avatarParam.itemSize.width() + param.margin_h;
             m_itemList.append(item);
@@ -79,7 +86,7 @@ void CLJLotteryAnimationView::start(int lotteryCount)
     QRect rect(0,0,(param.avatarParam.itemSize.width() + param.margin_h) * param.col + param.margin_h,
                y - param.margin_v / 2 - param.margin_v - param.avatarParam.itemSize.height());
     {
-        m_scene->addRect(rect,QPen(Qt::red),QBrush(QColor(12,0,0,77)));
+//        m_scene->addRect(rect,QPen(Qt::red),QBrush(QColor(12,0,0,77)));
     }
     this->setMinimumHeight(rect.height());
     this->setMaximumHeight(rect.height());
@@ -88,8 +95,8 @@ void CLJLotteryAnimationView::start(int lotteryCount)
 
 void CLJLotteryAnimationView::wheelEvent(QWheelEvent *event)
 {
-    return QGraphicsView::wheelEvent(event);
     event->accept();
+    return QGraphicsView::wheelEvent(event);
 }
 
 void CLJLotteryAnimationView::onTimeout()
@@ -105,7 +112,12 @@ void CLJLotteryAnimationView::onTimeout()
         if(y + param.avatarParam.itemSize.height() < param.margin_v / 2)
         {
             y += contentHeight;
-            obj->updateConttent();
+
+            QPixmap pixmap = CLJLotteryManager::getInstance()->getUserPixmap(param.imageType,false,this->devicePixelRatio());
+            if(!pixmap.isNull())
+            {
+                obj->setPixmap(pixmap);
+            }
         }
         obj->setPos(pos.x(),y);
     }

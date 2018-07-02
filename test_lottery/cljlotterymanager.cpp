@@ -58,8 +58,16 @@ QPixmap CLJLotteryManager::getUserLablePixmap(CLJLotteryManager::ImageType type,
 
     QPixmap pixmap(QString(":/res/lottery/lottery_%1user_%2.png").arg(isWinner?"win_":"").arg(getImageTypeString(type)));
     qDebug()<<"QPixmap pixmap"<<(pixmap.isNull() ? "Y":"N");
-    pixmap = pixmap.scaled(param.labelRect.size()* devicePixelRatio,
-                                     Qt::KeepAspectRatioByExpanding,Qt::SmoothTransformation);
+    if(!pixmap.isNull())
+    {
+        pixmap = pixmap.scaled(param.labelRect.size()* devicePixelRatio,
+                               Qt::KeepAspectRatioByExpanding,Qt::SmoothTransformation);
+    }
+    else
+    {
+        pixmap = QPixmap(param.labelRect.size()* devicePixelRatio);
+        pixmap.fill(QColor(128,128,128));
+    }
     s_cacheLablePixmapMap.insert(key,pixmap);
     return pixmap;
 }
@@ -75,67 +83,102 @@ QPixmap CLJLotteryManager::getWinnerLablePixmap(CLJLotteryManager::ImageType typ
     UserAvatarParam param(type,true);
 
     QPixmap pixmap(QString(":/res/lottery/lottery_win_label_%1.png").arg(getImageTypeString(type)));
-    qDebug()<<"QPixmap pixmap"<<(pixmap.isNull() ? "Y":"N");
-    pixmap = pixmap.scaled(param.winnerLableRect.size()* devicePixelRatio,
-                                     Qt::KeepAspectRatioByExpanding,Qt::SmoothTransformation);
+
+    if(!pixmap.isNull())
+    {
+        pixmap = pixmap.scaled(param.winnerLableRect.size()* devicePixelRatio,
+                                         Qt::KeepAspectRatioByExpanding,Qt::SmoothTransformation);
+    }
+    else
+    {
+        pixmap = QPixmap(param.winnerLableRect.size()* devicePixelRatio);
+        pixmap.fill(QColor(128,128,128));
+    }
     s_cacheLablePixmapMap.insert(key,pixmap);
     return pixmap;
 }
 
 QPixmap CLJLotteryManager::getUserPixmap(ImageType type, bool isWinner, int devicePixelRatio)
 {
-    if(!m_unDownloadUserList.isEmpty())
-    {
-        request();
-    }
-    //
+    bool needRquest = true;
+    QPixmap pixmap;
     if(!m_finishedUserList.isEmpty())
     {
         QSharedPointer<CLJLotteryUser> obj = m_finishedUserList.takeFirst();
         m_loadUserList.append(obj);
-        return createUserPixmap(obj,type,isWinner,devicePixelRatio);
+        pixmap = createUserPixmap(obj,type,isWinner,devicePixelRatio);
+    }
+    else if(!m_unDownloadUserList.isEmpty())
+    {
+        needRquest = false;
+        QSharedPointer<CLJLotteryUser> obj = loadOneImage();
+        pixmap = createUserPixmap(obj,type,isWinner,devicePixelRatio);
     }
     else if(!m_loadUserList.isEmpty())
     {
         m_repeatIndex = m_repeatIndex % m_loadUserList.count();
-        return createUserPixmap(m_loadUserList.at(m_repeatIndex++),type,isWinner,devicePixelRatio);
+        pixmap = createUserPixmap(m_loadUserList.at(m_repeatIndex++),type,isWinner,devicePixelRatio);
     }
-    return QPixmap();
-
+    if(needRquest)
+    {
+        loadOneImage();;
+    }
+    return pixmap;
 }
 
 QPixmap CLJLotteryManager::createUserPixmap(const QSharedPointer<CLJLotteryUser> &user, ImageType type, bool isWinner, int devicePixelRatio)
 {
+    if(user.isNull())
+    {
+        return m_defaultAvatar;
+    }
+
     QString key = createKey(user.data()->getId(),type,isWinner,devicePixelRatio);
     if(m_cechePixmapMap.contains(key))
     {
         return m_cechePixmapMap.value(key);
     }
+    QPixmap avatar = user.data()->getPixmap();
+    QPixmap userPixmap = createUserPixmap(avatar,type,isWinner,devicePixelRatio,user.data()->getName());
 
-    QPixmap avtarPixmap = user.data()->getPixmap();
-    if(avtarPixmap.isNull())
+    if(!avatar.isNull())
     {
-        return QPixmap();
+        m_cechePixmapMap.insert(key,userPixmap);
     }
+    return userPixmap;
+}
+
+QPixmap CLJLotteryManager::createUserPixmap(const QSharedPointer<CLJLotteryUser> &user, CLJLotteryManager::ImageType type, bool isWinner)
+{
+    return createUserPixmap(user,type,isWinner,getApplicationDevicePixelRatio());
+}
+
+QPixmap CLJLotteryManager::createUserPixmap(const QPixmap &avatarPixmap, CLJLotteryManager::ImageType type, bool isWinner, int devicePixelRatio, const QString &name)
+{
+    QPixmap avatarTemp = avatarPixmap;
+    if(avatarTemp.isNull())
+    {
+        avatarTemp = m_defaultAvatar;
+    }
+
     UserAvatarParam param(type,isWinner);
     QSize pixmapSize(param.itemSize * devicePixelRatio);
 
-    avtarPixmap = avtarPixmap.scaled(param.avatarRect.size() * devicePixelRatio,
+    avatarTemp = avatarTemp.scaled(param.avatarRect.size() * devicePixelRatio,
                                      Qt::KeepAspectRatioByExpanding,Qt::SmoothTransformation);
-    avtarPixmap = createEllipsePixmap(avtarPixmap);
+    avatarTemp = createEllipsePixmap(avatarTemp);
 
     QPixmap userPixmap(pixmapSize);
-    userPixmap.fill(QColor(77,77,77,50));
+    userPixmap.fill(QColor(77,77,77,0));
     QPainter painter(&userPixmap);
 //    painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing
 //                           | QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing);
     painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
-
     {
         painter.save();
         QPen pen(Qt::NoPen);
         painter.setPen(pen);
-        painter.drawPixmap(param.avatarRect.x() * devicePixelRatio,param.avatarRect.y() *devicePixelRatio,avtarPixmap);
+        painter.drawPixmap(param.avatarRect.x() * devicePixelRatio,param.avatarRect.y() *devicePixelRatio,avatarTemp);
         painter.restore();
     }
     {
@@ -145,17 +188,18 @@ QPixmap CLJLotteryManager::createUserPixmap(const QSharedPointer<CLJLotteryUser>
         painter.setPen(pen);
         painter.drawEllipse(QRectF(pen.widthF() / 2 + param.avatarRect.x() * devicePixelRatio,
                                    pen.widthF() / 2 + param.avatarRect.y() * devicePixelRatio,
-                                   avtarPixmap.width() - pen.widthF(),avtarPixmap.height() - pen.widthF()));
+                                   avatarTemp.width() - pen.widthF(),avatarTemp.height() - pen.widthF()));
         painter.restore();
     }
-    {
-        painter.save();
-        QPen pen(QColor(0,0,255,55));
-        pen.setWidth(6);
-        painter.setPen(pen);
-        painter.drawRect(QRect(0,0,pixmapSize.width(),pixmapSize.height()));
-        painter.restore();
-    }
+//    {
+//        painter.save();
+//        QPen pen(QColor(0,0,255,55));
+//        pen.setWidth(6);
+//        painter.setPen(pen);
+//        painter.drawRect(QRect(0,0,pixmapSize.width(),pixmapSize.height()));
+//        painter.restore();
+//    }
+
     {
         QPixmap pixmap = getUserLablePixmap(type,isWinner,devicePixelRatio);
         painter.drawPixmap(param.labelRect.x() * devicePixelRatio,param.labelRect.y() * devicePixelRatio,pixmap);
@@ -171,17 +215,23 @@ QPixmap CLJLotteryManager::createUserPixmap(const QSharedPointer<CLJLotteryUser>
         QFont font;
         font.setPointSizeF(param.fontPixelSizeF);
         painter.setFont(font);
-        painter.drawText(textRangeRect,user.data()->getName(),QTextOption(Qt::AlignHCenter | Qt::AlignVCenter));
+        painter.drawText(textRangeRect,name,QTextOption(Qt::AlignHCenter | Qt::AlignVCenter));
         painter.restore();
     }
+
     if(isWinner)
     {
         QPixmap pixmap = getWinnerLablePixmap(type,devicePixelRatio);
         painter.drawPixmap(param.winnerLableRect.x() * devicePixelRatio,param.winnerLableRect.y() * devicePixelRatio,pixmap);
     }
+
     userPixmap.setDevicePixelRatio(devicePixelRatio);
-    m_cechePixmapMap.insert(key,userPixmap);
     return userPixmap;
+}
+
+int CLJLotteryManager::getApplicationDevicePixelRatio()
+{
+    return ((QApplication*)QApplication::instance())->devicePixelRatio();
 }
 
 int CLJLotteryManager::getUserReadyCount()
@@ -216,6 +266,7 @@ QList<QSharedPointer<CLJLotteryUser> > CLJLotteryManager::getSelectedUsers()
 
 void CLJLotteryManager::testAll()
 {
+    m_status = LOTTERY_STATUS_STARTING;
     if(m_unDownloadUserList.isEmpty())
     {
         appendUser("");
@@ -235,10 +286,12 @@ void CLJLotteryManager::stop()
     m_selectedUserList.clear();
     for(int i = 0; i < count; ++i)
     {
-        QString id = QString::number(i+10);
+        QString id = QString::number(qrand() % m_allUserMap.count());
         if(m_allUserMap.contains(id))
         {
-            m_selectedUserList.append(m_allUserMap.value(id));
+            QSharedPointer<CLJLotteryUser> obj = m_allUserMap.value(id);
+            obj.data()->loadImage();
+            m_selectedUserList.append(obj);
         }
     }
     m_status = LOTTERY_STATUS_FINISHED;
@@ -251,10 +304,7 @@ void CLJLotteryManager::onUserDownloadFinished(const QString &id, int error)
     {
         return;
     }
-//    qDebug()<<Q_FUNC_INFO<<m_downloadingUserMap.count();
-
     QSharedPointer<CLJLotteryUser> obj = m_downloadingUserMap.take(id);
-//    qDebug()<<Q_FUNC_INFO<<"AA"<<m_downloadingUserMap.count();
 
     if(error == 0)
     {
@@ -266,9 +316,9 @@ void CLJLotteryManager::onUserDownloadFinished(const QString &id, int error)
         //TODO 错误了是否还需要重新下载
 //        m_unDownloadUserList.append(obj);
     }
-    if(m_finishedUserList.count() >= m_lotteryCount && m_status == LOTTERY_STATUS_NORMAL)
+    if(/*m_finishedUserList.count() >= m_lotteryCount && */m_status == LOTTERY_STATUS_STARTING)
     {
-        m_status = LOTTERY_STATUS_STARTING;
+//        m_status = LOTTERY_STATUS_STARTING;
         emit sigUserDataReady();
     }
 
@@ -276,7 +326,6 @@ void CLJLotteryManager::onUserDownloadFinished(const QString &id, int error)
 
 void CLJLotteryManager::request()
 {
-//    qDebug()<<Q_FUNC_INFO<<__LINE__;
     int downCount = m_cacheCount - m_downloadingUserMap.count();
     for(int i = 0; i < downCount;++i)
     {
@@ -284,15 +333,16 @@ void CLJLotteryManager::request()
         {
             break;
         }
-        QSharedPointer<CLJLotteryUser> obj = m_unDownloadUserList.takeFirst();
-        m_downloadingUserMap.insert(obj.data()->getId(),obj);
-        connect(obj.data(),SIGNAL(sigDownloadFinished(QString,int)),this,SLOT(onUserDownloadFinished(QString,int)));
-        obj.data()->loadImage();
+        loadOneImage();
     }
 }
 
 void CLJLotteryManager::appendUser(const QString &json)
 {
+    if(m_status != LOTTERY_STATUS_STARTING)
+    {
+        return;
+    }
     for(int i = 0; i < 100; ++i)
     {
         QString id = QString::number(i);
@@ -310,10 +360,30 @@ QString CLJLotteryManager::createKey(const QString &id, ImageType type, bool isW
     return QString("id:=%1type=%2isWinner=%3radio=%4").arg(id).arg(type).arg(isWinner?"Y":"N").arg(devicePixelRatio);
 }
 
+QSharedPointer<CLJLotteryUser> CLJLotteryManager::loadOneImage()
+{
+    if(m_unDownloadUserList.isEmpty())
+    {
+        return QSharedPointer<CLJLotteryUser>();
+    }
+    QSharedPointer<CLJLotteryUser> obj = m_unDownloadUserList.takeFirst();
+    m_downloadingUserMap.insert(obj.data()->getId(),obj);
+    connect(obj.data(),SIGNAL(sigDownloadFinished(QString,int)),this,SLOT(onUserDownloadFinished(QString,int)));
+    obj.data()->loadImage();
+    return obj;
+}
+
 CLJLotteryManager::CLJLotteryManager()
     :m_status(LOTTERY_STATUS_NORMAL)
     ,m_lotteryCount(6)
 {
+    m_defaultAvatar = QPixmap(":/res/lottery/lottery_default_avatar.png");
+    if(m_defaultAvatar.isNull())
+    {
+        m_defaultAvatar = QPixmap(256,256);
+        m_defaultAvatar.fill(QColor(128,128,128));
+    }
+    m_lotteryTitle = "TDJ";
 
 }
 

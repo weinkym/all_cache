@@ -77,6 +77,13 @@ void CLJLotterResultDialog::showResult(bool show)
     m_viewAnimation->setVisible(!show);
     ui->pushButtonClose->setVisible(show);
     m_viewResult->setVisible(show);
+    ui->labelTitle->setVisible(show);
+    ui->labelContent->setStyleSheet(QString("font-size: %1px;color:%2;").arg(show ? 13:23).arg(show ? "#000000":"#FF0000"));
+    if(show)
+    {
+        ui->labelTitle->setText(CLJLotteryManager::getInstance()->getLotteryTitle());
+        ui->labelContent->setText(tr("%1P").arg(CLJLotteryManager::getInstance()->getLotteryCount()));
+    }
 }
 
 void CLJLotterResultDialog::on_pbStop_clicked()

@@ -6,17 +6,17 @@
 
 class CLJLotteryUserItem : public QGraphicsPixmapItem
 {
-//    Q_OBJECT
-public:
-    CLJLotteryUserItem(CLJLotteryManager::ImageType &type,bool isWinner,QGraphicsItem *parent = Q_NULLPTR);
-    ~CLJLotteryUserItem();
-//    void setSize(const QSize &size);
 
-    void updateConttent();
-//    void start();
+public:
+    CLJLotteryUserItem(const QSharedPointer<CLJLotteryUser> &obj,CLJLotteryManager::ImageType &type,
+                       bool isWinner,QGraphicsItem *parent = Q_NULLPTR);
+    ~CLJLotteryUserItem();
 
 private:
-    QPixmap m_pixmap;
+    void updateConttent();
+
+private:
+    QSharedPointer<CLJLotteryUser> m_userObj;
     bool m_isWinner;
     CLJLotteryManager::ImageType m_imageType;
 };

@@ -56,6 +56,12 @@ public:
     QPixmap getUserPixmap(ImageType type,bool isWinner,int devicePixelRatio = 1);
 
     QPixmap createUserPixmap(const QSharedPointer<CLJLotteryUser> &user,ImageType type,bool isWinner,int devicePixelRatio);
+    QPixmap createUserPixmap(const QSharedPointer<CLJLotteryUser> &user,ImageType type,bool isWinner);
+
+    QPixmap createUserPixmap(const QPixmap &avatarPixmap,ImageType type,bool isWinner,int devicePixelRatio,const QString &name);
+
+
+    int getApplicationDevicePixelRatio();
 
     int getUserReadyCount();
     int getLotteryCount();
@@ -74,10 +80,13 @@ private:
     void request();
     void appendUser(const QString &json);
     static QString createKey(const QString &id,ImageType type,bool isWinner,int devicePixelRatio);
+    QSharedPointer<CLJLotteryUser> loadOneImage();
+
 
 signals:
     void sigUserDataReady();
     void sigLotteryFinished(int error);
+    void sigUserAvatarUpdate(const QString &id);
 
 protected:
     CLJLotteryManager();
@@ -87,6 +96,7 @@ protected:
     int m_cacheCount = 30;
     int m_repeatIndex = 0;
     int m_lotteryCount = 3;
+    QPixmap m_defaultAvatar;
     QString m_lotteryTitle;
     QSize m_itemSize;
 

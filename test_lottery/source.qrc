@@ -15,5 +15,6 @@
         <file>res/lottery/lottery_close_normal.png</file>
         <file>res/lottery/lottery_stop.png</file>
         <file>res/lottery/lottery_title_winner.png</file>
+        <file>res/lottery/lottery_default_avatar.png</file>
     </qresource>
 </RCC>

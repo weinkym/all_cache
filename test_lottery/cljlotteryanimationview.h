@@ -5,7 +5,8 @@
 #include "cljlotterymanager.h"
 
 class QGraphicsScene;
-class CLJLotteryUserItem;
+class QGraphicsPixmapItem;
+
 class CLJLotteryAnimationView : public QGraphicsView
 {
     Q_OBJECT
@@ -26,7 +27,7 @@ private:
     QGraphicsScene *m_scene;
     CLJLotteryManager::ViewParam param;
     QTimer m_timer;
-    QList<CLJLotteryUserItem*> m_itemList;
+    QList<QGraphicsPixmapItem*> m_itemList;
 };
 
 #endif // CLJLOTTERYANIMATIONVIEW_H
